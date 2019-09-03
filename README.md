@@ -20,10 +20,10 @@ Now you can analyze images
 $ IMAGE=registry.local:80/ubuntu-test docker-compose up klar
 ```
 
-## DB anschauen
+## Look inside the DB
 
-With adminer you look at the data in the database at [localhost:8080](http://localhost:8080).  
-System: PostgreSQL  
-Server: postgres  
-User: postgres  
-Passwort: postgres  
+With adminer you can look at the data in the database at [localhost:8080](http://localhost:8080).  
+system: PostgreSQL  
+server: postgres  
+user: postgres  
+password: postgres  
