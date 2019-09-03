@@ -1,0 +1,101 @@
+version: "3.5"
+
+services:
+  registry:
+    image: registry:latest
+    container_name: clair-registry
+    ports:
+      - "5000:5000"
+    networks:
+      - clair
+
+  registry.local:
+    image: abiosoft/caddy
+    container_name: clair-registry.local
+    volumes:
+      - ./Caddyfile:/etc/Caddyfile
+    ports:
+      - "443:443"
+      - "80:80"
+    depends_on:
+      - registry
+    networks:
+      - clair
+
+  dind:
+    image: docker:18-dind
+    container_name: clair-dind
+    privileged: true
+    networks:
+      - clair
+    command: ["--insecure-registry=registry.local"]
+
+  registry.content:
+    image: docker:18-dind
+    container_name: clair-registry.content
+    volumes:
+      - ./importImages.sh:/importImages.sh
+    environment:
+      DOCKER_HOST: tcp://dind:2375
+    depends_on:
+      - dind
+      - registry
+    networks:
+      - clair
+    command: ["/importImages.sh"]
+
+  postgres:
+    image: postgres:latest
+    container_name: clair-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ""
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    networks:
+      - clair
+
+  clair:
+    image: quay.io/coreos/clair:latest
+    container_name: clair
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "6060-6061:6060-6061"
+    volumes:
+      - /tmp:/tmp
+      - ./clair_config:/config
+    networks:
+      - clair
+    command: ["-insecure-tls", "-config", "/config/config.yaml"]
+
+  klar:
+    build:
+      context: klar
+    image: klar:latest
+    container_name: clair-klar
+    environment:
+      CLAIR_ADDR: clair:6060
+      CLAIR_OUTPUT: Low
+      CLAIR_THRESHOLD: 10
+      REGISTRY_INSECURE: "true"
+    networks:
+      - clair
+    command: ["$IMAGE"]
+  
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks: 
+      - clair
+
+networks:
+  clair:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.0.0/24

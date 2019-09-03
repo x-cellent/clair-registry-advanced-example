@@ -1,0 +1,13 @@
+https://registry.local, http://registry.local {
+  tls self_signed
+
+  proxy /v2 registry:5000 {
+		transparent
+	}
+
+  proxy /v1 registry:5000 {
+		transparent
+	}
+
+  log / stdout
+}
