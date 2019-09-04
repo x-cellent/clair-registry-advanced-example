@@ -15,6 +15,12 @@ $ docker-compose up -d
 ```
 To get real results you should wait some time for Clair to download vulnerabity data. (This can take some time)
 
+You can fill the Docker Registy with images to test by changing the file [importImages.sh](importImages.sh) and running this instruction:
+
+```
+$ docker-compose up registry.content
+```
+
 Now you can analyze images
 ```
 $ IMAGE=registry.local:80/ubuntu-test docker-compose up klar
