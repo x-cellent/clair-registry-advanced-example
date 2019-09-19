@@ -1,6 +1,6 @@
 # Clair + Registry Advanced Setup
 
-This project refers to this [blog articel](https://www.x-cellent.com/blog/advanced-clair-registry-setup/). There you find an indepth explanation.  
+This project refers to this [blog articel](https://www.x-cellent.com/blog/advanced-clair-registry-setup/). There you can find an indepth explanation.  
 
 ## Requirements
 
